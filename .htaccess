@@ -1,0 +1,12 @@
+# Denegar acceso a archivos sensibles
+<FilesMatch "\.(env|git|htaccess|sql)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Denegar acceso a directorios
+RedirectMatch 403 ^/(app|config|database|logs|cron)/.*$
+
+# Redireccionar todo al directorio public
+RewriteEngine On
+RewriteRule ^(.*)$ public/$1 [L]

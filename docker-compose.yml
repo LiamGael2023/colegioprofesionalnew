@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  # Servidor Web PHP 8.1 con Apache
+  web:
+    build: .
+    container_name: colegio_web
+    ports:
+      - "8080:80"
+    volumes:
+      - ./:/var/www/html
+    depends_on:
+      - mysql
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_NAME=colegio_profesional
+      - DB_USER=colegio_user
+      - DB_PASS=colegio_pass_2024
+    networks:
+      - colegio_network
+    restart: unless-stopped
+
+  # Base de datos MySQL 8.0
+  mysql:
+    image: mysql:8.0
+    container_name: colegio_mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password_2024
+      MYSQL_DATABASE: colegio_profesional
+      MYSQL_USER: colegio_user
+      MYSQL_PASSWORD: colegio_pass_2024
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    networks:
+      - colegio_network
+    restart: unless-stopped
+    command: --default-authentication-plugin=mysql_native_password
+
+  # phpMyAdmin (opcional, para administración de BD)
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: colegio_phpmyadmin
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: root_password_2024
+    depends_on:
+      - mysql
+    networks:
+      - colegio_network
+    restart: unless-stopped
+
+networks:
+  colegio_network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+    driver: local

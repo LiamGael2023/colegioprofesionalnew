@@ -1,0 +1,25 @@
+# Habilitar reescritura de URL
+RewriteEngine On
+
+# Si el archivo o directorio existe, servir directamente
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# De lo contrario, redireccionar a index.php
+RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
+
+# Denegar acceso a archivos .ht
+<Files .htaccess>
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Seguridad adicional
+<IfModule mod_headers.c>
+    Header set X-XSS-Protection "1; mode=block"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-Content-Type-Options "nosniff"
+</IfModule>
+
+# Deshabilitar listado de directorios
+Options -Indexes
